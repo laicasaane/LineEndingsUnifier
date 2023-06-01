@@ -119,6 +119,16 @@
             }
         }
 
+        private bool IsAnyFileFormat()
+        {
+            return SupportedFileFormats == null || SupportedFileFormats.Length < 1;
+        }
+
+        private bool IsAnyFileName()
+        {
+            return SupportedFileNames == null || SupportedFileNames.Length < 1;
+        }
+
         private int DocumentSaveListener_BeforeSave(uint docCookie)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -135,7 +145,9 @@
                     var supportedFileFormats = SupportedFileFormats;
                     var supportedFileNames = SupportedFileNames;
 
-                    if (currentDocument.Name.EndsWithAny(supportedFileFormats) || currentDocument.Name.EqualsAny(supportedFileNames))
+                    if ((IsAnyFileFormat() || currentDocument.Name.EndsWithAny(supportedFileFormats))
+                        || (IsAnyFileName() || currentDocument.Name.EqualsAny(supportedFileNames))
+                    )
                     {
                         Output($"{LogStrings.UnifyingStarted}\n");
                         var numberOfChanges = 0;
@@ -226,8 +238,10 @@
             ThreadHelper.ThrowIfNotOnUIThread();
 
             var selectedFile = Ide.SelectedItems.Item(1).ProjectItem;
+            var unifyCondition = (IsAnyFileFormat() || selectedFile.Name.EndsWithAny(SupportedFileFormats))
+                || (IsAnyFileName() || selectedFile.Name.EqualsAny(SupportedFileNames));
 
-            UnifyLineEndingsFromSolutionExplorerMenuCommand(selectedFile.Name, UnifyOperation, selectedFile.Name.EndsWithAny(SupportedFileFormats) || selectedFile.Name.EqualsAny(SupportedFileNames));
+            UnifyLineEndingsFromSolutionExplorerMenuCommand(selectedFile.Name, UnifyOperation, unifyCondition);
 
             int UnifyOperation(LineEndingsChanger.LineEnding lineEndings)
             {
@@ -278,6 +292,8 @@
 
             var supportedFileFormats = SupportedFileFormats;
             var supportedFileNames = SupportedFileNames;
+            var isAnyFileFormat = IsAnyFileFormat();
+            var isAnyFileName = IsAnyFileName();
 
             foreach (ProjectItem item in projectItems)
             {
@@ -286,7 +302,8 @@
                     UnifyLineEndingsInProjectItems(item.ProjectItems, lineEnding, ref numberOfChanges);
                 }
 
-                if (item.Name.EndsWithAny(supportedFileFormats) || item.Name.EqualsAny(supportedFileNames))
+                if ((isAnyFileFormat || item.Name.EndsWithAny(supportedFileFormats))
+                    || (isAnyFileName || item.Name.EqualsAny(supportedFileNames)))
                 {
                     UnifyLineEndingsInProjectItem(item, lineEnding, ref numberOfChanges);
                 }
