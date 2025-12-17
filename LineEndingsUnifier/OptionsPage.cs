@@ -32,6 +32,11 @@
         private string _supportedFileFormats;
 
         [Category(Category)]
+        [DisplayName("Support Any File")]
+        [Description("Determines if any file is supported, ultimately ignores \"Supported File Formats\" and \"Supported File Names\"")]
+        public bool SupportAnyFile { get; set; }
+
+        [Category(Category)]
         [DisplayName("Supported File Formats")]
         [Description("Files with these formats will have line endings unified")]
         public string SupportedFileFormats

@@ -474,7 +474,10 @@
             return GetTextBuffer(documentFullPath, out textView);
         }
 
-        private bool DocumentMatchesConfiguredFileFormatsOrFilenames(string filename) => filename.EndsWithAny(OptionsPage.SupportedFileFormatsArray) || filename.EqualsAny(OptionsPage.SupportedFilenamesArray);
+        private bool DocumentMatchesConfiguredFileFormatsOrFilenames(string filename)
+            => OptionsPage.SupportAnyFile
+            || filename.EndsWithAny(OptionsPage.SupportedFileFormatsArray)
+            || filename.EqualsAny(OptionsPage.SupportedFilenamesArray);
 
         private void Output(string message)
         {
